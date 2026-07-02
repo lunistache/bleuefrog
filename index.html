@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLEUE FROG | Film · Music · Events</title>
+    <meta name="description" content="Bleue Frog — a film production house, music label and event studio. Crafting soundtracks, stories and experiences.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark (default) */
+            --cold-blue: #1c1d1f;
+            --ice-white: #ededed;
+            --frost: #5b8cff;
+            --subtle-text: rgba(237, 237, 237, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-strong: rgba(255, 255, 255, 0.08);
+            --border-soft: rgba(255, 255, 255, 0.05);
+            --border-soft-2: rgba(255, 255, 255, 0.10);
+            --hover-fill: rgba(255, 255, 255, 0.03);
+            --glass-bg: rgba(28, 29, 31, 0.2);
+            --overlay-top: rgba(20, 20, 22, 0.5);
+            --overlay-bottom: rgba(20, 20, 22, 0.72);
+            --scroll-thumb: #3a3a3e;
+            --line: #ffffff;
+            --menu-bg: #161618;
+        }
+
+        body.light {
+            /* Light */
+            --cold-blue: #f4f1ea;
+            --ice-white: #1a1a1a;
+            --frost: #5b8cff;
+            --subtle-text: rgba(26, 26, 26, 0.5);
+            --border: rgba(0, 0, 0, 0.12);
+            --border-strong: rgba(0, 0, 0, 0.14);
+            --border-soft: rgba(0, 0, 0, 0.08);
+            --border-soft-2: rgba(0, 0, 0, 0.10);
+            --hover-fill: rgba(0, 0, 0, 0.03);
+            --glass-bg: rgba(244, 241, 234, 0.3);
+            --overlay-top: rgba(244, 241, 234, 0.05);
+            --overlay-bottom: rgba(244, 241, 234, 0.25);
+            --scroll-thumb: #cfc8b8;
+            --line: #1a1a1a;
+            --menu-bg: #efe9dd;
+        }
+
+        body {
+            background-color: var(--cold-blue);
+            color: var(--ice-white);
+            font-family: 'Space Grotesk', sans-serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* A24-Style Grid System */
+        .a24-grid { border: 1px solid var(--border); }
+        .a24-cell { border: 1px solid var(--border); transition: all 0.5s ease; }
+        .a24-cell:hover { background: var(--hover-fill); }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        /* Page Transitions */
+        .page-content { display: none; opacity: 0; transform: translateY(5px); transition: all 0.6s ease; }
+        .page-content.active { display: block; opacity: 1; transform: translateY(0); }
+
+        #mobile-menu {
+            background: var(--menu-bg);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        #mobile-menu.active { transform: translateY(0); opacity: 1; }
+
+        .line { transition: all 0.3s ease; transform-origin: center; background: var(--line); }
+        .menu-active .line-1 { transform: translateY(3.5px) rotate(45deg); }
+        .menu-active .line-2 { transform: translateY(-3.5px) rotate(-45deg); }
+
+        .glow-text { transition: all 0.5s ease; }
+        .glow-text:hover { text-shadow: 0 0 15px rgba(91, 140, 255, 0.5); color: var(--frost); }
+
+        /* Soon badge */
+        .soon-badge {
+            font-size: 8px;
+            letter-spacing: 0.3em;
+            padding: 3px 8px;
+            border: 1px solid rgba(91, 140, 255, 0.4);
+            color: rgba(91, 140, 255, 0.9);
+            border-radius: 2px;
+        }
+
+        /* A24-style film list */
+        .film-list { list-style: none; margin: 0; padding: 0; }
+        .film-row {
+            border-top: 1px solid var(--border-strong);
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 2rem;
+            padding: 1.6rem 1.5rem;
+            transition: opacity 0.4s ease, background 0.4s ease;
+        }
+        .film-row:last-child { border-bottom: 1px solid var(--border-strong); }
+        /* Dim the whole list on hover, spotlight the hovered row (A24 effect) */
+        .film-list:hover .film-row { opacity: 0.25; }
+        .film-list .film-row:hover { opacity: 1; background: var(--hover-fill); }
+        .film-title {
+            font-size: clamp(2.2rem, 7vw, 5.5rem);
+            font-weight: 200;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            transition: color 0.4s ease;
+        }
+        .film-title:hover { color: var(--frost); }
+        .film-soon { cursor: pointer; }
+        .film-year {
+            font-size: 14px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            white-space: nowrap;
+        }
+
+        /* Full-page background preview image */
+        .film-preview {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 1;
+            transition: opacity 0.6s ease;
+            overflow: hidden;
+        }
+        .film-preview.visible { opacity: 1; }
+        .film-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.05);
+            transition: transform 6s ease;
+        }
+        .film-preview.visible img { transform: scale(1); }
+        /* Darkening overlay so the film titles stay readable */
+        .film-preview::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, var(--overlay-top), var(--overlay-bottom));
+        }
+        /* Keep the studio content above the background image */
+        #studio .studio-layer { position: relative; z-index: 10; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--cold-blue); }
+        ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
+        /* Theme toggle (sliding sun / moon) */
+        .theme-toggle { position: relative; width: 54px; height: 26px; flex: none; border: 1px solid var(--border-soft-2); border-radius: 999px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; cursor: pointer; background: transparent; color: var(--ice-white); }
+        .theme-toggle svg { width: 13px; height: 13px; opacity: 0.55; position: relative; z-index: 1; }
+        .theme-toggle .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--frost); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(30px); }
+        body.light .theme-toggle .knob { transform: translateX(0); }
+        .scroll-cue { background: linear-gradient(to bottom, var(--line), transparent); }
+        .bd-soft2 { border-color: var(--border-soft-2); }
+        .hero-sub { color: var(--subtle-text); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="fixed top-0 w-full z-[100] glass h-28 flex items-center justify-between px-6 md:px-16">
+        <div class="text-[16px] tracking-[0.4em] font-normal uppercase cursor-pointer" onclick="switchPage('home')">Bleue Frog</div>
+
+        <div class="hidden md:flex gap-10 text-[16px] tracking-[0.2em] font-normal uppercase md:absolute md:left-1/2 md:-translate-x-1/2">
+            <button onclick="switchPage('studio')" class="hover:text-[#5b8cff] transition-colors">The Studio</button>
+            <button onclick="switchPage('label')" class="hover:text-[#5b8cff] transition-colors">The Label</button>
+            <button onclick="switchPage('events')" class="hover:text-[#5b8cff] transition-colors">Events</button>
+            <button onclick="switchPage('contact')" class="hover:text-[#5b8cff] transition-colors">Contact</button>
+        </div>
+
+        <div class="flex items-center gap-5">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light / dark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span class="knob"></span>
+            </button>
+            <button id="menu-btn" class="md:hidden z-[110] flex flex-col gap-1.5 p-4 focus:outline-none">
+                <div class="line line-1 w-6 h-[1px]"></div>
+                <div class="line line-2 w-6 h-[1px]"></div>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center space-y-10">
+        <button onclick="switchPage('studio')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">The Studio</button>
+        <button onclick="switchPage('label')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">The Label</button>
+        <button onclick="switchPage('events')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">Events</button>
+        <button onclick="switchPage('contact')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">Contact</button>
+    </div>
+
+    <!-- ============ HOME ============ -->
+    <div id="home" class="page-content active">
+        <section class="h-screen w-full flex flex-col items-center justify-center relative px-6 text-center">
+            <div class="z-10">
+                <h1 class="text-6xl md:text-9xl font-thin tracking-tighter mb-6 transition-all">BLEUE <span class="font-normal">FROG</span></h1>
+                <p class="text-[12px] md:text-[15px] tracking-[0.7em] uppercase hero-sub font-bold">
+                    <button onclick="switchPage('studio')" class="font-bold hover:text-[#5b8cff] transition-colors">Film</button>
+                    <span class="mx-1">·</span>
+                    <button onclick="switchPage('label')" class="font-bold hover:text-[#5b8cff] transition-colors">Music</button>
+                    <span class="mx-1">·</span>
+                    <button onclick="switchPage('events')" class="font-bold hover:text-[#5b8cff] transition-colors">Events</button>
+                </p>
+            </div>
+            <div class="absolute bottom-12 left-1/2 -translate-x-1/2 opacity-20">
+                <div class="w-[1px] h-20 scroll-cue"></div>
+            </div>
+        </section>
+
+        <!-- Three pillars -->
+        <section class="grid grid-cols-1 md:grid-cols-3 a24-grid">
+            <button onclick="switchPage('studio')" class="a24-cell p-12 md:p-16 text-left group min-h-[280px] flex flex-col justify-between">
+                <span class="text-[10px] tracking-widest opacity-30 font-bold">01 / FILM</span>
+                <div>
+                    <h3 class="text-3xl font-light tracking-tight mb-3">The Studio</h3>
+                    <p class="text-[11px] font-light opacity-40 leading-relaxed">A production house for films and stories built from cold light and long shadows.</p>
+                    <p class="text-[10px] tracking-[0.3em] uppercase mt-6 opacity-50 group-hover:text-[#5b8cff] transition-colors">Explore &rarr;</p>
+                </div>
+            </button>
+            <button onclick="switchPage('label')" class="a24-cell p-12 md:p-16 text-left group min-h-[280px] flex flex-col justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] tracking-widest opacity-30 font-bold">02 / MUSIC</span>
+                    <span class="soon-badge uppercase">Coming Soon</span>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-light tracking-tight mb-3">The Label</h3>
+                    <p class="text-[11px] font-light opacity-40 leading-relaxed">A record label in the making — experimental sounds and original soundtracks.</p>
+                    <p class="text-[10px] tracking-[0.3em] uppercase mt-6 opacity-50 group-hover:text-[#5b8cff] transition-colors">Learn more &rarr;</p>
+                </div>
+            </button>
+            <button onclick="switchPage('events')" class="a24-cell p-12 md:p-16 text-left group min-h-[280px] flex flex-col justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] tracking-widest opacity-30 font-bold">03 / EVENTS</span>
+                    <span class="soon-badge uppercase">Coming Soon</span>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-light tracking-tight mb-3">Events</h3>
+                    <p class="text-[11px] font-light opacity-40 leading-relaxed">Parties, concerts and immersive experiences where sound meets the senses.</p>
+                    <p class="text-[10px] tracking-[0.3em] uppercase mt-6 opacity-50 group-hover:text-[#5b8cff] transition-colors">Learn more &rarr;</p>
+                </div>
+            </button>
+        </section>
+    </div>
+
+    <!-- ============ THE STUDIO (FILM) ============ -->
+    <div id="studio" class="page-content">
+        <div class="studio-layer min-h-screen flex flex-col justify-center pt-32 pb-24">
+            <div class="px-6 md:px-16 mb-12 md:mb-16">
+                <h2 class="text-5xl md:text-7xl font-thin tracking-tighter uppercase">The Studio</h2>
+                <p class="text-[10px] tracking-[0.5em] opacity-30 mt-4">FILM PRODUCTION HOUSE</p>
+            </div>
+
+            <ul class="film-list px-6 md:px-16">
+                <li class="film-row" data-film="blue">
+                    <a href="#" onclick="switchPage('movie-blue'); return false;" class="film-title">Blue Or Green</a>
+                    <span class="film-year">2025 &middot; Out Now</span>
+                </li>
+                <li class="film-row" data-film="trop">
+                    <a href="#" onclick="switchPage('movie-trop'); return false;" class="film-title film-soon">La &laquo;,&raquo; De Trop</a>
+                    <span class="film-year">Coming Soon</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Cursor-following preview -->
+        <div id="film-preview" class="film-preview"><img id="film-preview-img" alt=""></div>
+    </div>
+
+    <!-- ============ MOVIE: BLUE OR GREEN ============ -->
+    <div id="movie-blue" class="page-content">
+        <div class="pt-32 md:pt-40 pb-32">
+            <div class="px-6 md:px-16 mb-8 max-w-6xl mx-auto w-full">
+                <button onclick="switchPage('studio')" class="text-[12px] tracking-[0.3em] uppercase opacity-50 hover:text-[#5b8cff] transition-colors">&larr; The Studio</button>
+            </div>
+
+            <!-- Video -->
+            <section class="px-6 md:px-16">
+                <div class="aspect-video border bd-soft2 overflow-hidden bg-black max-w-6xl mx-auto">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/T8Qv0-MVrf4?feature=oembed" title="BLUE OR GREEN" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </section>
+
+            <!-- Title -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-14">
+                <h1 class="text-5xl md:text-7xl font-thin tracking-tighter uppercase">Blue Or Green</h1>
+                <p class="text-[14px] tracking-[0.3em] uppercase opacity-50 mt-4">2025 &middot; Out Now</p>
+            </section>
+
+            <!-- Synopsis + credits -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-16 grid md:grid-cols-3 gap-14">
+                <div class="md:col-span-2">
+                    <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-6">Synopsis</h2>
+                    <p class="text-lg md:text-xl font-light leading-relaxed opacity-80">
+                        [Add the synopsis of Blue Or Green here — what the film is about, its tone and story.]
+                    </p>
+                    <a href="https://www.youtube.com/watch?v=T8Qv0-MVrf4" target="_blank" rel="noopener" class="inline-block mt-10 text-[13px] tracking-[0.2em] uppercase hover:text-[#5b8cff] transition-colors underline underline-offset-4">Watch on YouTube &rarr;</a>
+                </div>
+                <div>
+                    <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-6">Credits</h2>
+                    <dl class="space-y-4 text-[14px] font-light">
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Directed by</dt><dd>Mathery</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Written by</dt><dd>Luca Fontaine</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Starring</dt><dd>Marcia DeBonis &middot; Luca Fontaine</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Cinematography</dt><dd>Peter Pascucci</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Producers</dt><dd>Lindsay Alexandra Carter &middot; Mathery</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Editor</dt><dd>Lucas Moesch</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Music</dt><dd>Jackleg</dd></div>
+                        <div><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px] mb-1">Year</dt><dd>2025</dd></div>
+                    </dl>
+                </div>
+            </section>
+
+            <!-- Full credits -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-20">
+                <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-8">Full Credits</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-6 text-[13px] font-light">
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Executive Producers</p><p>Luca Fontaine &middot; Michael Marks</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Associate Producers</p><p>Peter Repplier &middot; Crystal Arnette</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Story Consultant</p><p>Nicola Fontaine</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Mix &amp; Sound Design</p><p>Mattia Tavani &middot; Matteo Marrella</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Music Supervisors</p><p>Stefano Riva &middot; Emanuela Drei</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Production &amp; Costume Design</p><p>Mathery</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">1st AD</p><p>Lindsay Alexandra Carter</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Gaffer</p><p>Forrest Erwin</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Colorist</p><p>Joseph Bicknell &middot; Company 3 NY</p></div>
+                    <div><p class="opacity-40 uppercase tracking-[0.2em] text-[10px] mb-1">Title Designer</p><p>Vittorio Perotti</p></div>
+                </div>
+            </section>
+
+            <!-- Stills -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-24">
+                <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-8">Stills</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/blue%20or%20green/Marcia%20before.png" alt="Blue Or Green still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/blue%20or%20green/Photo%20set.jpg" alt="Blue Or Green still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/blue%20or%20green/Photo%20set%202.jpg" alt="Blue Or Green still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/blue%20or%20green/Photo%20set%203.jpg" alt="Blue Or Green still" loading="lazy">
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ============ MOVIE: LA «,» DE TROP ============ -->
+    <div id="movie-trop" class="page-content">
+        <div class="pt-32 md:pt-40 pb-32">
+            <div class="px-6 md:px-16 mb-8 max-w-6xl mx-auto w-full">
+                <button onclick="switchPage('studio')" class="text-[12px] tracking-[0.3em] uppercase opacity-50 hover:text-[#5b8cff] transition-colors">&larr; The Studio</button>
+            </div>
+
+            <!-- Hero still -->
+            <section class="px-6 md:px-16">
+                <div class="aspect-video border bd-soft2 overflow-hidden relative max-w-6xl mx-auto">
+                    <img class="w-full h-full object-cover" src="The%20studio/Pictures/virgule/WhatsApp%20Image%202026-06-04%20at%2004.00.18.jpeg" alt="La «,» De Trop still" loading="lazy">
+                    <div class="absolute inset-0 flex items-center justify-center" style="background: var(--overlay-bottom);">
+                        <span class="text-[12px] md:text-[14px] tracking-[0.5em] uppercase">Coming Soon</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Title -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-14">
+                <h1 class="text-5xl md:text-7xl font-thin tracking-tighter uppercase">La &laquo;,&raquo; De Trop</h1>
+                <p class="text-[14px] tracking-[0.3em] uppercase opacity-50 mt-4">Coming Soon</p>
+            </section>
+
+            <!-- Synopsis + credits -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-16 grid md:grid-cols-3 gap-14">
+                <div class="md:col-span-2">
+                    <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-6">Synopsis</h2>
+                    <p class="text-lg md:text-xl font-light leading-relaxed opacity-80">
+                        Serge est totalement con et paumé.
+                    </p>
+                </div>
+                <div>
+                    <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-6">Credits</h2>
+                    <dl class="space-y-5 text-[14px] font-light">
+                        <div class="flex justify-between border-b bd-soft2 pb-3"><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px]">Director</dt><dd>[Name]</dd></div>
+                        <div class="flex justify-between border-b bd-soft2 pb-3"><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px]">Cast</dt><dd>[Names]</dd></div>
+                        <div class="flex justify-between border-b bd-soft2 pb-3"><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px]">Status</dt><dd>In Production</dd></div>
+                        <div class="flex justify-between border-b bd-soft2 pb-3"><dt class="opacity-40 uppercase tracking-[0.2em] text-[11px]">Release</dt><dd>TBA</dd></div>
+                    </dl>
+                </div>
+            </section>
+
+            <!-- Stills -->
+            <section class="max-w-6xl mx-auto px-6 md:px-16 mt-24">
+                <h2 class="text-[12px] tracking-[0.4em] uppercase opacity-40 mb-8">Stills</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/virgule/WhatsApp%20Image%202026-06-04%20at%2004.00.22.jpeg" alt="La «,» De Trop still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/virgule/WhatsApp%20Image%202026-06-04%20at%2004.00.24.jpeg" alt="La «,» De Trop still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/virgule/WhatsApp%20Image%202026-06-04%20at%2004.00.30.jpeg" alt="La «,» De Trop still" loading="lazy">
+                    <img class="w-full aspect-video object-cover border bd-soft2" src="The%20studio/Pictures/virgule/WhatsApp%20Image%202026-06-%20at%2004.00.28.jpeg" alt="La «,» De Trop still" loading="lazy">
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ============ THE LABEL (MUSIC) ============ -->
+    <div id="label" class="page-content">
+        <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+            <h2 class="text-7xl md:text-9xl font-thin tracking-tighter uppercase">The Label</h2>
+            <p class="text-[14px] md:text-[18px] tracking-[0.5em] opacity-40 mt-6 mb-12">EXPERIMENTAL SOUNDS</p>
+            <span class="soon-badge uppercase inline-block text-[12px] px-4 py-1.5">Coming Soon</span>
+        </div>
+    </div>
+
+    <!-- ============ EVENTS ============ -->
+    <div id="events" class="page-content">
+        <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+            <h2 class="text-7xl md:text-9xl font-thin tracking-tighter uppercase">Events</h2>
+            <p class="text-[14px] md:text-[18px] tracking-[0.5em] opacity-40 mt-6 mb-12">PARTIES &middot; CONCERTS &middot; EXPERIENCES</p>
+            <span class="soon-badge uppercase inline-block text-[12px] px-4 py-1.5">Coming Soon</span>
+        </div>
+    </div>
+
+    <!-- ============ CONTACT ============ -->
+    <div id="contact" class="page-content">
+        <div class="min-h-screen flex flex-col items-center justify-center px-6">
+            <div class="max-w-4xl w-full text-center">
+                <h2 class="text-[14px] md:text-[16px] tracking-[0.6em] uppercase mb-16 opacity-40">Get in Touch</h2>
+                <div class="glass p-12 md:p-24 border bd-soft2 rounded-sm inline-block w-full max-w-3xl">
+                    <p class="text-[13px] tracking-widest uppercase opacity-50 mb-8">Collaborations</p>
+                    <a href="mailto:bleue.frog@gmail.com" class="text-3xl md:text-5xl font-thin tracking-tight glow-text">bleue.frog@gmail.com</a>
+                    <div class="mt-20 grid grid-cols-2 md:grid-cols-3 gap-12 pt-10 border-t bd-soft2">
+                        <div class="text-center"><p class="text-[12px] tracking-[0.3em] uppercase opacity-40 mb-3">Instagram</p><a href="https://www.instagram.com/bleue_frog/?hl=en" class="text-[15px] font-light hover:text-[#5b8cff] transition-colors">@bleue_frog</a></div>
+                        <div class="text-center"><p class="text-[12px] tracking-[0.3em] uppercase opacity-40 mb-3">YouTube</p><a href="https://www.youtube.com/@BleueFrog" target="_blank" rel="noopener" class="text-[15px] font-light hover:text-[#5b8cff] transition-colors">Bleue Frog</a></div>
+                        <div class="text-center col-span-2 md:col-span-1"><p class="text-[12px] tracking-[0.3em] uppercase opacity-40 mb-3">Location</p><span class="text-[15px] font-light">Paris / Global</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchPage(pageId) {
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.remove('active'));
+
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+
+            // Studio / Label / Events / Contact are single locked screens; the rest scroll
+            const singleScreen = ['studio', 'label', 'events', 'contact'].includes(pageId);
+
+            // Close mobile menu
+            document.body.classList.remove('menu-active');
+            document.getElementById('mobile-menu').classList.remove('active');
+            document.body.style.overflow = singleScreen ? 'hidden' : 'auto';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            document.body.classList.toggle('menu-active');
+            mobileMenu.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        /* ---- Light / dark theme toggle ---- */
+        if (localStorage.getItem('bf-theme') === 'light') {
+            document.body.classList.add('light');
+        }
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const isLight = document.body.classList.toggle('light');
+            localStorage.setItem('bf-theme', isLight ? 'light' : 'dark');
+        });
+
+        /* ---- A24-style film hover preview ---- */
+        const filmImages = {
+            blue: [
+                "The studio/Pictures/blue or green/Marcia before.png",
+                "The studio/Pictures/blue or green/Photo set.jpg",
+                "The studio/Pictures/blue or green/Photo set 2.jpg",
+                "The studio/Pictures/blue or green/Photo set 3.jpg"
+            ],
+            trop: [
+                "The studio/Pictures/virgule/WhatsApp Image 2026-0 at 04.00.30.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06- at 04.00.28.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06-04 4.00.28.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06-04 at 04.00.18.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06-04 at 04.00.22.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06-04 at 04.00.24.jpeg",
+                "The studio/Pictures/virgule/WhatsApp Image 2026-06-04 at 04.00.30.jpeg"
+            ]
+        };
+
+        // Preload so the swap is instant
+        Object.values(filmImages).flat().forEach(src => {
+            const img = new Image();
+            img.src = encodeURI(src);
+        });
+
+        const preview = document.getElementById('film-preview');
+        const previewImg = document.getElementById('film-preview-img');
+        let previewActive = false;
+
+        function showPreview(film) {
+            const set = filmImages[film] || [];
+            if (!set.length) return; // nothing to show (e.g. upcoming films)
+            const src = set[Math.floor(Math.random() * set.length)];
+            previewImg.src = encodeURI(src);
+            preview.classList.add('visible');
+            previewActive = true;
+        }
+
+        function hidePreview() {
+            preview.classList.remove('visible');
+            previewActive = false;
+        }
+
+        document.querySelectorAll('.film-row').forEach(row => {
+            row.addEventListener('mouseenter', () => showPreview(row.dataset.film));
+            row.addEventListener('mouseleave', hidePreview);
+        });
+    </script>
+</body>
+</html>
