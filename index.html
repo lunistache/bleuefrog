@@ -445,11 +445,18 @@
     </div>
 
     <script>
-        function switchPage(pageId) {
+        function switchPage(pageId, opts) {
+            opts = opts || {};
+
+            // Fall back to home if the id is missing or isn't a real page
+            let targetPage = document.getElementById(pageId);
+            if (!targetPage || !targetPage.classList.contains('page-content')) {
+                pageId = 'home';
+                targetPage = document.getElementById('home');
+            }
+
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => page.classList.remove('active'));
-
-            const targetPage = document.getElementById(pageId);
             targetPage.classList.add('active');
 
             // Studio / Label / Events / Contact are single locked screens; the rest scroll
@@ -460,8 +467,34 @@
             document.getElementById('mobile-menu').classList.remove('active');
             document.body.style.overflow = singleScreen ? 'hidden' : 'auto';
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: opts.instant ? 'auto' : 'smooth' });
+
+            // Keep the URL in sync so pages are shareable / refresh-safe / back-button-aware
+            if (!opts.fromHistory) {
+                const url = (pageId === 'home') ? location.pathname + location.search : '#' + pageId;
+                history.pushState({ page: pageId }, '', url);
+            }
         }
+
+        // Resolve which page a URL hash refers to
+        function pageFromHash() {
+            const id = (location.hash || '').replace('#', '');
+            const el = document.getElementById(id);
+            return (el && el.classList.contains('page-content')) ? id : 'home';
+        }
+
+        // Back / forward navigation
+        window.addEventListener('popstate', (e) => {
+            const id = (e.state && e.state.page) ? e.state.page : pageFromHash();
+            switchPage(id, { fromHistory: true });
+        });
+
+        // Open the right page on first load (deep link / refresh)
+        (function initRouting() {
+            const start = pageFromHash();
+            history.replaceState({ page: start }, '', (start === 'home') ? location.pathname + location.search : '#' + start);
+            switchPage(start, { fromHistory: true, instant: true });
+        })();
 
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
