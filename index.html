@@ -126,7 +126,9 @@
             text-transform: uppercase;
             opacity: 0.5;
             white-space: nowrap;
+            transition: color 0.4s ease, opacity 0.4s ease;
         }
+        .film-row:hover .film-year { color: #fff; opacity: 1; font-weight: 700; }
 
         /* Full-page background preview image */
         .film-preview {
@@ -163,7 +165,7 @@
         /* Theme toggle (sliding sun / moon) */
         .theme-toggle { position: relative; width: 54px; height: 26px; flex: none; border: 1px solid var(--border-soft-2); border-radius: 999px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; cursor: pointer; background: transparent; color: var(--ice-white); }
         .theme-toggle svg { width: 13px; height: 13px; opacity: 0.55; position: relative; z-index: 1; }
-        .theme-toggle .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--frost); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(30px); }
+        .theme-toggle .knob { position: absolute; top: 2px; left: 2.5px; width: 20px; height: 20px; border-radius: 50%; background: var(--frost); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(27px); }
         body.light .theme-toggle .knob { transform: translateX(0); }
         .scroll-cue { background: linear-gradient(to bottom, var(--line), transparent); }
         .bd-soft2 { border-color: var(--border-soft-2); }
@@ -178,7 +180,7 @@
         <div class="hidden md:flex gap-10 text-[16px] tracking-[0.2em] font-normal uppercase md:absolute md:left-1/2 md:-translate-x-1/2">
             <button onclick="switchPage('studio')" class="hover:text-[#5b8cff] transition-colors">The Studio</button>
             <button onclick="switchPage('label')" class="hover:text-[#5b8cff] transition-colors">The Label</button>
-            <button onclick="switchPage('events')" class="hover:text-[#5b8cff] transition-colors">Events</button>
+            <button onclick="switchPage('events')" class="hover:text-[#5b8cff] transition-colors">The Events</button>
             <button onclick="switchPage('contact')" class="hover:text-[#5b8cff] transition-colors">Contact</button>
         </div>
 
@@ -198,7 +200,7 @@
     <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center space-y-10">
         <button onclick="switchPage('studio')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">The Studio</button>
         <button onclick="switchPage('label')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">The Label</button>
-        <button onclick="switchPage('events')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">Events</button>
+        <button onclick="switchPage('events')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">The Events</button>
         <button onclick="switchPage('contact')" class="mobile-link text-2xl font-thin tracking-[0.3em] uppercase">Contact</button>
     </div>
 
@@ -260,7 +262,7 @@
         <div class="studio-layer min-h-screen flex flex-col justify-center pt-32 pb-24">
             <div class="px-6 md:px-16 mb-12 md:mb-16">
                 <h2 class="text-5xl md:text-7xl font-thin tracking-tighter uppercase">The Studio</h2>
-                <p class="text-[10px] tracking-[0.5em] opacity-30 mt-4">FILM PRODUCTION HOUSE</p>
+                <p class="text-[10px] tracking-[0.5em] opacity-60 mt-4 font-bold">FILM PRODUCTION HOUSE</p>
             </div>
 
             <ul class="film-list px-6 md:px-16">
@@ -420,7 +422,7 @@
     <!-- ============ EVENTS ============ -->
     <div id="events" class="page-content">
         <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
-            <h2 class="text-7xl md:text-9xl font-thin tracking-tighter uppercase">Events</h2>
+            <h2 class="text-7xl md:text-9xl font-thin tracking-tighter uppercase">The Events</h2>
             <p class="text-[14px] md:text-[18px] tracking-[0.5em] opacity-40 mt-6 mb-12">PARTIES &middot; CONCERTS &middot; EXPERIENCES</p>
             <span class="soon-badge uppercase inline-block text-[12px] px-4 py-1.5">Coming Soon</span>
         </div>
